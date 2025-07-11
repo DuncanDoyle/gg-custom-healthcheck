@@ -12,11 +12,11 @@ RUN go mod download
 COPY *.go ./
 
 # Compile the application
-RUN CGO_ENABLED=0 GOOS=linux go build -o /go-portal-microcks-integration
+RUN CGO_ENABLED=0 GOOS=linux go build -o /gg-custom-healthcheck
 
 # Expose a port if needed.
 # This application does not need to expose anything, so we can simply comment this out.
 #EXPOSE 8080
 
 # Run
-CMD ["/go-portal-microcks-integration"]
+CMD ["/gg-custom-healthcheck"]
