@@ -48,18 +48,14 @@ func getRoot(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "Custom healthcheck pod. Please use the /healthz endpoint!\n")
 }
 
-
-
 func getHealthz(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("got /healthz request\n")
 
 	//ddoyle: Execute a cURL command
-	// We need to execute:  /shared/curl --haproxy-protocol -o /dev/null 127.0.0.1:8443/envoy-hc
-
-	// curl := exec.Command("curl", "-s", "-o", "/dev/null", "-w", "\"%{http_code}\"", "http://httpbin.org/status/400")
-	// curl := exec.Command("curl", "-s", "-o", "/dev/null", "-w", "\"%{http_code}\"", "https://www.google.com")
-	curl := exec.Command("curl", "--haproxy-protocol", "-o", "/dev/null", "127.0.0.1:8443/envoy-hc")
-	// curl := exec.Command("curl", "--haproxy-protocol", "-o", "/dev/null", "https://127.0.0.1:8443/envoy-hc")
+	// We need to execute:  curl -k -s --haproxy-protocol -o /dev/null -w %{http_code} https://127.0.0.1:8443/envoy-hc
+	curl := exec.Command("curl", "-k", "-s", "--haproxy-protocol", "-o", "/dev/null", "-w", "%{http_code}", "https://127.0.0.1:8443/envoy-hc")
+	// curl := exec.Command("curl", "-s", "-o", "/dev/null", "-w", "%{http_code}", "http://httpbin.org/status/200")
+	
 	httpResponse, err := curl.Output()
 	if err != nil {
 		fmt.Println("erorr" , err)
@@ -69,7 +65,7 @@ func getHealthz(w http.ResponseWriter, r *http.Request) {
 	}
 	//Check response code
 	httpResponseString := string(httpResponse[:])
-	if (httpResponseString == "\"200\"") {
+	if (httpResponseString == "200") {
 		fmt.Printf("Healthcheck response is OK: %s\n", httpResponseString)
 		io.Writer.Write(w, httpResponse)
 	} else {
